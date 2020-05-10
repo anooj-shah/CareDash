@@ -1,15 +1,15 @@
 import json
-from datetime import datetime
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+
 '''
-  URI can be any database - MySQL, PostgreSQL, etc.
+  URI can be any database - MySQL, PostgreSQL, Oracle, etc.
   The code is the same for any type of database.
   This is the beauty of SQLAlchemy
 '''
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db' # CHANGE to MySQL URI, PostgreSQL URI, etc...
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
