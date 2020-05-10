@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
@@ -10,11 +11,10 @@ db = SQLAlchemy(app)
 class Doctor(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   name = db.Column(db.String, nullable=False)
-  reviews = db.relationship('Review', backref='author', lazy=True)
+  reviews = db.relationship('Review', backref='author', lazy=True, cascade = "all, delete, delete-orphan")
 
   def __repr__(self):
-      return f"Doctor('')"
-
+    return f"Doctor('')"
 
 class Review(db.Model):
   id = db.Column(db.Integer, primary_key=True)
@@ -50,44 +50,72 @@ def add_doctor_review(doctor_id):
 @app.route('/doctors/<doctor_id>', methods=['GET'])
 def get_doctor(doctor_id):
   doc = Doctor.query.get(doctor_id)
-  print(doc)
-  return jsonify(id=doc.id, name=doc.name, reviews=doc.reviews)
+  output = {}
+  output['name'] = doc.name
+  output['id'] = doc.id
+  reviews = []
+  for i in doc.reviews:
+    review_object = {}
+    review_object['id'] = i.id
+    review_object['doctor_id'] = doc.id
+    review_object['description'] = i.description
+    reviews.append(review_object)
+  output['reviews'] = reviews
+  return json.dumps(output)
 
 @app.route('/doctors/<doctor_id>/reviews/<review_id>', methods=['GET'])
 def get_doctor_review(doctor_id, review_id):
   doc = Doctor.query.get(doctor_id)
   doc_reviews = doc.reviews
+  review_object = {}
   for i in doc.reviews:
-    if i.id == review_id:
-      return jsonify(id=i.id,doctor_id=i.doctor_id)
-  return jsonify()
-  # print(doc)
-  # return jsonify(id=doc.id, name=doc.name, reviews=doc.reviews)
+    if int(i.id) == int(review_id):
+      review_object = {}
+      review_object['id'] = i.id
+      review_object['doctor_id'] = doc.id
+      review_object['description'] = i.description
+  return json.dumps(review_object)
 
 @app.route('/doctors', methods=['GET'])
 def get_all_doctors_and_reviews():
-  # doctors_all = Doctor.query.all()
-  return "test"
-  # return jsonify(doctors_all)
+  doctors_all = Doctor.query.all()
+  doctors_arr = []
+  reviews = []
+  review_object = {}
+  curr_doc = {}
+  for i in doctors_all:
+    curr_doc = {}
+    curr_doc['name'] = i.name
+    curr_doc['id'] = i.id
+    reviews = []
+    for j in i.reviews:
+      review_object = {}
+      review_object['id'] = j.id
+      review_object['doctor_id'] = i.id
+      review_object['description'] = j.description
+      reviews.append(review_object)
+    curr_doc['reviews'] = reviews
+    doctors_arr.append(curr_doc)
+  return json.dumps(doctors_arr)
 
 @app.route('/doctors/<doctor_id>/reviews/<review_id>', methods=['DELETE'])
 def delete_doctor_review(doctor_id, review_id):
-  doc = Doctor.query.get(doctor_id)
+  doc = Doctor.query.filter_by(id=doctor_id).first()
   doc_reviews = doc.reviews
   for i in doc.reviews:
-    if i.id == review_id:
-      review = doc.reviews.query.get(review_id)
-  db.session.delete(doc)
+    if int(i.id) == int(review_id):
+      review = Review.query.filter_by(id=review_id).first()
+      db.session.delete(review)
   db.session.commit()
   return "success"
 
 @app.route('/doctors/<doctor_id>', methods=['DELETE'])
 def delete_doctor(doctor_id):
-  # Doctor.query.filter(Doctor.id == doctor_id).delete()
-  doc = Doctor.query.get(doctor_id)
-  db.session.delete(doc)
+  # rows_deleted = db.session.query(Doctor).filter(Doctor.id == 1).delete(synchronize_session='evaluate')
+  delete = Doctor.query.filter_by(id=doctor_id).first()
+  db.session.delete(delete)
   db.session.commit()
   return "success"
 
 if __name__ == '__main__':
-    app.run()
+  app.run()
