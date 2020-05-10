@@ -1,5 +1,5 @@
 # CareDash Backend 
-#### By Anooj Shah
+#### Developed by Anooj Shah
 
 ## Project Directory
 `CareDash.py` contains the API. On line 12 in `caredash.py`, the `SQLALCHEMY_DATANASE_URI` can be changes to any database including but not limited to MySQL, PostgreSQL, Oracle, SQLite, etc...
@@ -9,7 +9,7 @@ In `caredash.py`, I left it as SQLite so it can run without having to put a user
 `test.sh` is a test bash file that allows your to validate the API. 
 
 ## How to Deploy 
-`run-app.sh` includes the bash code to deploy the API. To run (MacOS), perform the following command: 
+`run-app.sh` includes the bash code to deploy the API. To run (MacOS), perform the following command:
 `sh run-app.sh PORT_NUMBER`
 
 This command will install the python packages via pip. It will also run `setup.py` as this will delete the database (if it already exists) and then it will create a new one. Then it will run the flask application on the specified port number. NOTE: All tests in `test.sh` are for Port 3000. 
