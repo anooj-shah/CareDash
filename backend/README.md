@@ -16,3 +16,7 @@ This command will install the python packages via pip. It will also run `setup.p
 
 ## Design Considerations
 Currently, the Reviews table has a primary key column called "id" which is automatically inserted each time an insert/POST operation occurs. This means that each row in the Reviews table is unique. I have made an **assumption** that each review id is supposed to be **unique globally rather than indexed at 1** for each doctor. 
+
+## Scalability 
+Scalability considerations to accommodate large colume of transactions and concurrent users can include the below enhancements and possibly more depending on further analysis. 
+For large systems, we can have multiple indexes that 
