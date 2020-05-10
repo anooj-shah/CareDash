@@ -13,8 +13,8 @@ The Navbar particularly is quite responsive as it adjusts to a drop down navbar 
 
 ## Responsive Views
 Desktop View (large screen): 
-![DesktopView](images/desktop_view.png)
+![DesktopView](images/desktop_view.png) 
 Table View: 
-![Tablet View](images/ipad_pro_view.png)
+![Tablet View](images/ipad_pro_view.png) 
 Mobile View: 
-![Mobile View](images/iphone_view.png)
+![Mobile View](images/iphone_view.png) 
