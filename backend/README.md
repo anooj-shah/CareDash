@@ -1,5 +1,5 @@
 # CareDash Backend 
-#### Anooj Shah
+#### Developed by Anooj Shah
 
 ## Project Directory
 `CareDash.py` contains the API. On line 12 in `caredash.py`, the `SQLALCHEMY_DATANASE_URI` can be changes to any database including but not limited to MySQL, PostgreSQL, Oracle, SQLite, etc...
