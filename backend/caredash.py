@@ -4,17 +4,27 @@ from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+'''
+  URI can be any database - MySQL, PostgreSQL, etc.
+  The code is the same for any type of database.
+  This is the beauty of SQLAlchemy
+'''
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
+'''
+  Create Tables as Models in SQLAlchemy
+'''
 class Doctor(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   name = db.Column(db.String, nullable=False)
   reviews = db.relationship('Review', backref='author', lazy=True, cascade = "all, delete, delete-orphan")
 
   def __repr__(self):
-    return f"Doctor('')"
+    # This is how the object would print out
+    # Since this is not needed, I left it as just 'Doctor' to let me know that it is a Doctor object
+    return f"Doctor('')" 
 
 class Review(db.Model):
   id = db.Column(db.Integer, primary_key=True)
@@ -22,22 +32,34 @@ class Review(db.Model):
   doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.id'), nullable=False)
 
   def __repr__(self):
+    # This is how the object would print out
+    # Since this is not needed, I left it as just 'Review' to let me know that it is a Review object
     return f"Review('')"
 
+'''
+  This is the base URL to test the API endpoint
+'''
 @app.route('/', methods=['GET'])
 def home():
-  return "successtest"
+  return "success test"
 
+'''
+  Create a doctor object
+  Input: name of doctor
+'''
 @app.route('/doctors', methods=['POST'])
 def create_doctor():
   content = request.json
   doctor_name = content['name']
-  print(doctor_name)
   doc = Doctor(name=doctor_name,reviews=[])
   db.session.add(doc)
   db.session.commit()
   return "success - added new doctor"
 
+'''
+  Create a doctor review
+  Input: doctor id, description of review
+'''
 @app.route('/doctors/<doctor_id>/reviews', methods=['POST'])
 def add_doctor_review(doctor_id):
   content = request.json
@@ -47,6 +69,11 @@ def add_doctor_review(doctor_id):
   db.session.commit()
   return "success - added new doctor review"
 
+'''
+  Get a doctor's information
+  Input: doctor id
+  Output: doctor object
+'''
 @app.route('/doctors/<doctor_id>', methods=['GET'])
 def get_doctor(doctor_id):
   doc = Doctor.query.get(doctor_id)
@@ -63,6 +90,11 @@ def get_doctor(doctor_id):
   output['reviews'] = reviews
   return json.dumps(output)
 
+'''
+  Get a doctor's review by id
+  Input: doctor id, review id
+  Output: review object
+'''
 @app.route('/doctors/<doctor_id>/reviews/<review_id>', methods=['GET'])
 def get_doctor_review(doctor_id, review_id):
   doc = Doctor.query.get(doctor_id)
@@ -76,6 +108,10 @@ def get_doctor_review(doctor_id, review_id):
       review_object['description'] = i.description
   return json.dumps(review_object)
 
+'''
+  Get all the doctors' information
+  Output: Doctors and respective reviews
+'''
 @app.route('/doctors', methods=['GET'])
 def get_all_doctors_and_reviews():
   doctors_all = Doctor.query.all()
@@ -98,6 +134,10 @@ def get_all_doctors_and_reviews():
     doctors_arr.append(curr_doc)
   return json.dumps(doctors_arr)
 
+'''
+  Delete a doctor review
+  Input: doctor id, review id
+'''
 @app.route('/doctors/<doctor_id>/reviews/<review_id>', methods=['DELETE'])
 def delete_doctor_review(doctor_id, review_id):
   doc = Doctor.query.filter_by(id=doctor_id).first()
@@ -109,9 +149,12 @@ def delete_doctor_review(doctor_id, review_id):
   db.session.commit()
   return "success"
 
+'''
+  Delete a doctor
+  Input: doctor id
+'''
 @app.route('/doctors/<doctor_id>', methods=['DELETE'])
 def delete_doctor(doctor_id):
-  # rows_deleted = db.session.query(Doctor).filter(Doctor.id == 1).delete(synchronize_session='evaluate')
   delete = Doctor.query.filter_by(id=doctor_id).first()
   db.session.delete(delete)
   db.session.commit()
